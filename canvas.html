@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <script src="js/shape.js"></script>
+    <script src="js/jquery.js"></script>
+    <style>
+        *{
+            font-family: "华文细黑","HanHei SC", PingHei, "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;color:#333;box-sizing: border-box;
+        }
+        body{
+            margin:0;padding:0;background: url(img/sinabloga.jpg) repeat #B29C77;
+        }
+        ul,li{
+            list-style: none;padding:0;margin:0;
+        }
+        header { width: 100%; background:url(img/sinablogb.png) no-repeat center #E3D6C3; height:290px; position:relative}
+        .box{
+            position:fixed;top:0;bottom:0;left:0;right:0;margin:auto;
+            width: 960px;
+            border-left: #b29c77 10px solid;
+            border-right: #b29c77 10px solid;
+            box-shadow: 0 -4px 6px 4px #726758;
+            background: #E3D6C3;
+            overflow: hidden;
+        }
+        .box-menu{
+            width:100%;height:8%;line-height: 54px;position:relative;z-index: 9999;margin-top: -148px;padding-left: 250px;
+        }
+        .box-menu>li{
+            height:100%;float: left;padding:0 25px;cursor:pointer;
+        }
+        .main{
+            width:100%;height:92%;
+        }
+        .aside-menu{
+            width:23.5%;height:100%;text-align: center;padding-top:120px;float:left;
+        }
+        .aside-menu-list{
+            cursor: pointer;
+        }
+        .aside-menu-list>li{
+            line-height: 30px;
+        }
+        .canvas-box{
+            width:76.5%;height:100%;float:left;position: relative;border-top:1px solid #B19C76;
+        }
+        .canvas-box .copy{
+            width:100%;height:100%;position:absolute;top:0;left:0;z-index: 999;cursor:crosshair;
+        }
+        .aside-menu-list:not(:first-child){
+            display: none;
+        }
+        input{
+            width:50%;
+        }
+        .xp{
+            width:10px;
+            height:10px;
+            border:1px solid #333;
+            border-radius:50%;
+            position: absolute;top:0;
+            left:0;
+            display:none;
+        }
+        .file {
+            position: relative;
+            display: inline-block;
+            background: #DFCCAC;
+            border: 1px solid #B19C76;
+            border-radius: 4px;
+            padding: 4px 12px;
+            overflow: hidden;
+            color: #000;
+            text-decoration: none;
+            text-indent: 0;
+            line-height: 20px;
+        }
+        .file input {
+            position: absolute;
+            font-size: 100px;
+            right: 0;
+            top: 0;
+            opacity: 0;
+        }
+        .file:hover {
+            background: #C9AC84;
+            border-color: #B19C76;
+            color: #000;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <header>
+            <object id="swftitlebar" data="img/79514.swf" width="100%" height="145" type="application/x-shockwave-flash">
+                <param name="allowScriptAccess" value="always">
+                <param name="allownetworking" value="all">
+                <param name="allowFullScreen" value="true">
+                <param name="wmode" value="transparent">
+                <param name="menu" value="false">
+                <param name="scale" value="noScale">
+                <param name="salign" value="1">
+            </object>
+        </header>
+        <ul class="box-menu">
+            <li class="menu-list">文件</li>
+            <li class="menu-list">画图</li>
+            <li class="menu-list">画图方式</li>
+            <li class="menu-list">颜色</li>
+            <li class="menu-list">线条宽度</li>
+            <li class="menu-list">擦除</li>
+            <li class="menu-list">滤镜</li>
+        </ul>
+        <div class="main">
+            <aside class="aside-menu">
+                <ul class="aside-menu-list">
+                    <li>新建</li>
+                    <li>后退</li>
+                    <li>前进</li>
+                    <li>保存</li>
+                    <li><a href="javascript:;" class="file">选择图片
+                        <input type="file" class="openfile">
+                        <img src="" alt="" hidden></a>
+                    </li>
+                </ul>
+                <ul class="aside-menu-list">
+                    <li data-role="line">画线</li>
+                    <li data-role="rect">矩形</li>
+                    <li data-role="arc">圆</li>
+                    <li data-role="polygon">多边形</li>
+                    <li data-role="star">星形</li>
+                    <li data-role="pencil">铅笔工具</li>
+                </ul>
+                <ul class="aside-menu-list">
+                    <li data-role="stroke">描边</li>
+                    <li data-role="fill">填充</li>
+                </ul>
+                <ul class="aside-menu-list">
+                    边框：<input data-role="strokeStyle" type="color"><br><br>
+                    填充：<input data-role="fillStyle" type="color">
+                </ul>
+                <ul class="aside-menu-list">
+                    <li data-role="1">细</li>
+                    <li data-role="3">中</li>
+                    <li data-role="5">粗</li>
+                    <li data-role="custom">粗细：<input type="range"></li>
+                </ul>
+                <ul class="aside-menu-list">
+                    大小：<input type="range">
+                </ul>
+                <ul class="aside-menu-list">
+                    <li data-role="blur">模糊</li>
+                    <li data-role="fx">反向</li>
+                    <li data-role="mosaic">马赛克</li>
+                </ul>
+            </aside>
+            <div class="canvas-box">
+                <canvas></canvas>
+                <div class="copy"></div>
+                <div class="xp"></div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    var canvasbox=document.querySelector(".canvas-box");
+    var widths=canvasbox.offsetWidth;
+    var heights=canvasbox.offsetHeight;
+    var copy=document.querySelector(".copy");
+    var canvas=document.querySelector("canvas");
+    var cobj=canvas.getContext("2d");
+    var xpObj=$(".xp");
+    canvas.width=widths;
+    canvas.height=heights;
+
+    var drawObj=new shape(canvas,copy,cobj,xpObj);
+
+//    菜单
+    $(".menu-list").click(function(){
+        var index=$(".menu-list").index(this);
+        $(".aside-menu-list").hide().eq(index).slideToggle(500);
+        xpObj.css({display:"none"});
+    })
+//    文件
+    $(".aside-menu-list:eq(0) li").click(function(){
+        var index=$(".aside-menu-list:eq(0) li").index(this);
+        //        新建
+        if(index==0){
+            if(drawObj.history.length>0){
+                var yes=confirm("是否保存");
+                if(yes){
+                    var url=canvas.toDataURL();
+                    var newurl=url.replace("image/png","stream/octet");
+                    location.href=newurl;
+                }
+            }
+            cobj.clearRect(0,0,canvas.width,canvas.height);
+            drawObj.history=[];
+        }
+        //        后退
+        else if(index==1){
+            if(drawObj.history.length==0){
+                //no
+                cobj.clearRect(0,0,canvas.width,canvas.height);
+                setTimeout(function(){
+                    alert("不能返回咯亲");
+                },10)
+            }else {
+                if (drawObj.isback) {
+                    if (drawObj.history.length == 1) {
+                        drawObj.history.pop();
+                        cobj.clearRect(0, 0, canvas.width, canvas.height);
+                    } else {
+                        drawObj.history.pop();
+                        cobj.putImageData(drawObj.history.pop(), 0, 0);
+                    }
+                } else {
+                    cobj.putImageData(drawObj.history.pop(), 0, 0);
+                }
+                drawObj.isback = false;
+            }
+        }
+        //        前进
+        else if(index==2){
+
+        }
+        //        保存
+        else if(index==3){
+            var url=canvas.toDataURL();
+            var newurl=url.replace("image/png","stream/octet");
+            location.href=newurl;
+        }
+    })
+
+//    选择图片
+    var openfile=document.querySelector(".openfile");
+    var img=document.querySelector("img");
+    openfile.onchange=function(){
+        var fileObj=this.files[0];
+        var reader=new FileReader();
+        reader.readAsDataURL(fileObj);
+        reader.onload=function(e){
+            img.src= e.target.result;
+            cobj.drawImage(img,0,0,canvas.width,canvas.height);
+            dataobj=cobj.getImageData(0,0,canvas.width,canvas.height);
+        }
+    }
+//    画图
+    $(".aside-menu-list:eq(1) li").click(function(){
+        var fn=$(this).attr("data-role");
+        if(fn!="pencil"){
+            if(fn=="polygon"){
+                drawObj.side=prompt("请输入边数",5);
+            }
+            if(fn=="star"){
+                drawObj.corner=prompt("请输入角数",5);
+            }
+            drawObj.type=fn;
+            drawObj.draw();
+        }else{
+            drawObj.pencil();
+        }
+    })
+//    画图方式
+    $(".aside-menu-list:eq(2) li").click(function(){
+        var fn=$(this).attr("data-role");
+        drawObj.style=fn;
+        drawObj.draw();
+    })
+//    颜色
+    $(".aside-menu-list:eq(3) input").change(function(){
+        drawObj[$(this).attr("data-role")]=$(this).val();
+        drawObj.draw();
+    })
+//    线条宽度
+    $(".aside-menu-list:eq(4) li").click(function(){
+        var num=$(this).attr("data-role");
+        if(num!="custom"){
+            drawObj.lineWidth=num;
+            drawObj.draw();
+        }
+    })
+    $(".aside-menu-list:eq(4) li input").change(function(){
+        var num=$(this).val();
+        drawObj.lineWidth=num;
+        drawObj.draw();
+    })
+//    橡皮擦
+    $(".menu-list:eq(5)").click(function(){
+        drawObj.isshow=true;
+        drawObj.eraser();
+    })
+    $(".aside-menu-list:eq(5) input").change(function(){
+        var num=$(this).val();
+        drawObj.xpsize=num;
+        drawObj.eraser();
+    })
+//    滤镜
+    $(".aside-menu-list:eq(6) li").click(function(){
+        var fn=$(this).attr("data-role");
+        if(fn=="blur"){
+            drawObj.blur(dataobj,5,0,0);
+        }else if(fn=="fx"){
+            drawObj.fx(dataobj,0,0);
+        }else if(fn=="mosaic"){
+            drawObj.mosaic(dataobj,50,0,0);
+        }
+    })
+</script>
+</html>
